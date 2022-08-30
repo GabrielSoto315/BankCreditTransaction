@@ -94,11 +94,10 @@ public class CreditTransactionServiceTest {
                 .when(creditTransactionRepository.save(creditTransaction))
                 .thenReturn(Mono.just(creditTransaction));
 
-        creditTransactionServiceImp.update(creditTransaction.getIdTransaction(), creditTransaction)
-                .map(response -> StepVerifier.create(Mono.just(response))
-                        .expectNextMatches(x -> x.getMessage().equals("Done"))
-                        .expectComplete()
-                        .verify());
+        StepVerifier.create(creditTransactionServiceImp.update(creditTransaction.getIdTransaction(), creditTransaction))
+                .expectNextMatches(x -> x.getMessage().equals("Done"))
+                .expectComplete()
+                .verify();
     }
 
     @Test
@@ -132,11 +131,10 @@ public class CreditTransactionServiceTest {
                 .when(creditTransactionRepository.save(creditTransaction))
                 .thenReturn(Mono.just(creditTransaction));
 
-        creditTransactionServiceImp.delete(creditTransaction.getIdTransaction())
-                .map(response -> StepVerifier.create(Mono.just(response))
-                        .expectNextMatches(x -> x.getMessage().equals("Done"))
-                        .expectComplete()
-                        .verify());
+        StepVerifier.create(creditTransactionServiceImp.delete(creditTransaction.getIdTransaction()))
+                .expectNextMatches(x -> x.getMessage().equals("Done"))
+                .expectComplete()
+                .verify();
     }
 
 
@@ -268,42 +266,27 @@ public class CreditTransactionServiceTest {
                 .verify();
     }
 
+    @Test
+    void chargeNotFundsTest() {
+        CreditTransaction creditTransaction = CreditTransactionMock.randomTransactionCharge();
+        Credit credit = CreditMock.randomCard();
 
-/*
+        creditTransaction.setAmount(credit.getBalance().add(new BigDecimal(1000)));
 
+        CreditResponse creditResponseMono = new CreditResponse();
+        creditResponseMono.setMessage("Done");
+        creditResponseMono.setStatus("OK");
+        creditResponseMono.setData(credit);
 
-    @Override
-    public Mono<ResponseHandler> RegisterCreditCharge(CreditTransaction oTransaction) {
-        log.info("Start Credit card charge transaction");
-        return creditService.FindCredit(oTransaction.getIdCredit()).flatMap(creditResponse -> {
-            if (creditResponse.getData().equals(null)){
-                return Mono.just(new ResponseHandler("Credit not found", HttpStatus.NOT_FOUND, null));
-            }else {
-                if (creditResponse.getData().getProduct().getName().equals("Credit Card")) {
-                    if (creditResponse.getData().getBalance().add(oTransaction.getAmount().negate()).compareTo(BigDecimal.ZERO) < 0){
-                        return Mono.just(new ResponseHandler("Don't have enough funds", HttpStatus.NOT_FOUND, null));
-                    }else {
-                        oTransaction.setIdClient(oTransaction.getIdClient() == null? creditResponse.getData().getIdClient() : oTransaction.getIdClient());
-                        oTransaction.setTransactionDate(new Date());
-                        oTransaction.setType("Credit Charge");
-                        oTransaction.setActive(true);
-                        oTransaction.setOldBalance(creditResponse.getData().getBalance());
-                        oTransaction.setNewBalance(creditResponse.getData().getBalance().add(oTransaction.getAmount().negate()));
-                        return creditTransactionRepository.save(oTransaction).flatMap(tran ->{
-                            log.info("Transaction saved" + oTransaction.toString());
-                            Credit updateCredit = new Credit();
-                            updateCredit.setIdCredit(tran.getIdCredit());
-                            updateCredit.setBalance(tran.getNewBalance());
-                            return creditService.UpdateCredit(updateCredit).flatMap(up ->{
-                                return Mono.just(new ResponseHandler("Done", HttpStatus.OK, up));
-                            });
-                        });
-                    }
-                }else {
-                    return Mono.just(new ResponseHandler("Credit not valid for this transaction", HttpStatus.BAD_REQUEST, null));
-                }
-            }
-        });
+        Mockito.when(creditTransactionRepository.save(creditTransaction))
+                .thenReturn(Mono.just(creditTransaction));
+
+        Mockito.when(CreditService.FindCredit("45210000000001"))
+                .thenReturn(Mono.just(creditResponseMono));
+
+        StepVerifier.create(creditTransactionServiceImp.RegisterCreditCharge(creditTransaction))
+                .expectNextMatches(x -> x.getMessage().equals("Don't have enough funds"))
+                .expectComplete()
+                .verify();
     }
-    */
 }

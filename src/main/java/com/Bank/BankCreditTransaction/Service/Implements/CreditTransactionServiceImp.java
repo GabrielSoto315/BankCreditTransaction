@@ -74,7 +74,7 @@ public class CreditTransactionServiceImp implements CreditTransactionService {
     @Override
     public Mono<ResponseHandler> delete(String id) {
         return creditTransactionRepository.existsById(id).flatMap(check ->{
-            if (check){
+            if (Boolean.TRUE.equals(check)){
                 return creditTransactionRepository.findById(id).flatMap(x ->{
                     x.setActive(false);
                     return creditTransactionRepository.save(x)
