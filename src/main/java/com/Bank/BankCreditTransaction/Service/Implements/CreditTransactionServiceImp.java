@@ -20,9 +20,9 @@ import java.util.Date;
 public class CreditTransactionServiceImp implements CreditTransactionService {
 
     @Autowired
-    ICreditTransactionRepository creditTransactionRepository;
+    private ICreditTransactionRepository creditTransactionRepository;
     @Autowired
-    CreditService creditService;
+    private CreditService creditService;
 
     private static final Logger log = LoggerFactory.getLogger(CreditTransactionServiceImp.class);
 
@@ -118,7 +118,7 @@ public class CreditTransactionServiceImp implements CreditTransactionService {
     public Mono<ResponseHandler> RegisterCreditCharge(CreditTransaction oTransaction) {
         log.info("Start Credit card charge transaction");
         return creditService.FindCredit(oTransaction.getIdCredit()).flatMap(creditResponse -> {
-            if (creditResponse.getData().equals(null)){
+            if (creditResponse.getData() == null){
                 return Mono.just(new ResponseHandler("Credit not found", HttpStatus.NOT_FOUND, null));
             }else {
                 if (creditResponse.getData().getProduct().getName().equals("Credit Card")) {

@@ -31,7 +31,7 @@ public class CreditTransactionController {
      * @return
      */
     @GetMapping()
-    public Mono<ResponseHandler> GetAll(){
+    public Mono<ResponseHandler> getAll(){
         return creditTransactionService.findAll();
     }
 
@@ -41,7 +41,7 @@ public class CreditTransactionController {
      * @return
      */
     @GetMapping("/{id}")
-    public Mono<ResponseHandler> FindbyId(@PathVariable("id") String id){
+    public Mono<ResponseHandler> findbyId(@PathVariable("id") String id){
         return creditTransactionService.find(id);
     }
 
@@ -51,12 +51,12 @@ public class CreditTransactionController {
      * @return
      */
     @GetMapping("/Credit/{idCredit}")
-    public Mono<ResponseHandler> FindbyCredit(@PathVariable("idCredit") String idCredit){
+    public Mono<ResponseHandler> findbyCredit(@PathVariable("idCredit") String idCredit){
         return creditTransactionService.findAllbyCredit(idCredit);
     }
 
     /**
-     * Actualizar datos de cliente empresa
+     * Actualizar datos de transaccion
      * @param id
      * @return
      */
@@ -71,7 +71,7 @@ public class CreditTransactionController {
      * @return
      */
     @DeleteMapping("/{id}")
-    public Mono<ResponseHandler>  DeletebyId(@PathVariable("id") String id){
+    public Mono<ResponseHandler>  deletebyId(@PathVariable("id") String id){
         return creditTransactionService.delete(id);
     }
 
@@ -81,7 +81,7 @@ public class CreditTransactionController {
      * @return
      */
     @PostMapping("Pay/")
-    public Mono<ResponseHandler> RegisterCreditPay(@RequestBody CreditTransaction oCreditTransaction){
+    public Mono<ResponseHandler> saveCreditPay(@RequestBody CreditTransaction oCreditTransaction){
         return creditTransactionService.RegisterCreditPay(oCreditTransaction);
     }
 

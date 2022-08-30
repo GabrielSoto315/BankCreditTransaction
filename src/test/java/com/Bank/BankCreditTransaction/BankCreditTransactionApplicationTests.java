@@ -9,5 +9,9 @@ class BankCreditTransactionApplicationTests {
 	@Test
 	void contextLoads() {
 	}
+	@Test
+	public void main() {
+		BankCreditTransactionApplication.main(new String[] {});
+	}
 
 }
