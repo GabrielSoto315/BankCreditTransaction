@@ -8,10 +8,11 @@ import java.math.BigDecimal;
 @Data
 public class Credit {
     @Id
-    private String id_credit_number;
+    private String idCredit;
     private String type;
     private BigDecimal amount;
     private BigDecimal balance;
-    private String client_number;
+    private String idClient;
+    private Product product;
 
 }

@@ -12,10 +12,12 @@
 	<artifactId>BankCreditTransaction</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>BankCreditTransaction</name>
-	<description>Demo project for Spring Boot</description>
+	<description>Project for Credit transactions</description>
 	<properties>
 		<java.version>11</java.version>
 		<spring-cloud.version>2021.0.3</spring-cloud.version>
+		<sonar.organization>gabrielsoto315</sonar.organization>
+		<sonar.host.url>https://sonarcloud.io</sonar.host.url>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -27,10 +29,17 @@
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-config</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-webflux</artifactId>
 		</dependency>
-
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-bootstrap</artifactId>
+		</dependency>
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
@@ -54,6 +63,11 @@
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>
 			<artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.jacoco</groupId>
+			<artifactId>jacoco-maven-plugin</artifactId>
+			<version>0.8.8</version>
 		</dependency>
 	</dependencies>
 
@@ -79,7 +93,7 @@
 			<plugin>
 				<groupId>org.jacoco</groupId>
 				<artifactId>jacoco-maven-plugin</artifactId>
-				<version>0.8.5</version>
+				<version>0.8.7</version>
 				<executions>
 					<execution>
 						<id>prepare-agent</id>
@@ -92,6 +106,11 @@
 						<goals>
 							<goal>report</goal>
 						</goals>
+						<configuration>
+							<formats>
+								<format>XML</format>
+							</formats>
+						</configuration>
 					</execution>
 				</executions>
 			</plugin>

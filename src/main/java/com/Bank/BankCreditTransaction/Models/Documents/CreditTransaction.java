@@ -17,10 +17,13 @@ import java.util.Date;
 @Data
 public class CreditTransaction {
     @Id
-    private String id;
-    private String id_credit_number;
-    private Date transaction_date;
+    private String idTransaction;
+    private String idCredit;
+    private Date transactionDate;
     private BigDecimal amount;
     private String type;
     private Boolean active;
+    private BigDecimal oldBalance;
+    private BigDecimal newBalance;
+    private String idClient;
 }

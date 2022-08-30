@@ -1,10 +1,10 @@
 package com.Bank.BankCreditTransaction.Controllers;
 
 import com.Bank.BankCreditTransaction.Models.Documents.CreditTransaction;
-import com.Bank.BankCreditTransaction.Models.Service.Result;
+import com.Bank.BankCreditTransaction.Models.Entities.ResponseHandler;
 import com.Bank.BankCreditTransaction.Repository.ICreditTransactionRepository;
-import com.Bank.BankCreditTransaction.Service.CreditService;
 import com.Bank.BankCreditTransaction.Service.CreditTransactionService;
+import com.Bank.BankCreditTransaction.Service.Implements.CreditTransactionServiceImp;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,60 +15,54 @@ import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.util.Map;
-
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("api/CreditTransaction/")
 public class CreditTransactionController {
 
     @Autowired
-    private ICreditTransactionRepository oCreditTransactionRep;
-    @Autowired
-    private CreditTransactionService oCreditTransactionSer;
+    private CreditTransactionService creditTransactionService;
 
 
     private static final Logger log = LoggerFactory.getLogger(CreditTransactionController.class);
 
     /**
-     * Lista todos los resultados
+     * Lista todos las transacciones encontradas
      * @return
      */
     @GetMapping()
-    public Flux<CreditTransaction> GetAll(){
-        return Flux.fromIterable(oCreditTransactionRep.findAll().toIterable());
+    public Mono<ResponseHandler> GetAll(){
+        return creditTransactionService.findAll();
     }
 
     /**
-     * Obtener resultado por id
+     * Obtener resultado por id de transaccion
      * @param id
      * @return
      */
     @GetMapping("/{id}")
-    public ResponseEntity<Mono<CreditTransaction>> FindbyId(@PathVariable("id") String id){
-        Mono<CreditTransaction> oCredit = oCreditTransactionRep.findById(id);
-        return new ResponseEntity<Mono<CreditTransaction>>(oCredit, oCredit != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
+    public Mono<ResponseHandler> FindbyId(@PathVariable("id") String id){
+        return creditTransactionService.find(id);
     }
 
     /**
-     * Guardar nueva transaccion de credito
-     * @param oCreditTransaction
+     * Obtener resultado por id de credito
+     * @param idCredit
      * @return
      */
-    @PostMapping()
-    public Mono<CreditTransaction> Save(@RequestBody CreditTransaction oCreditTransaction){
-        oCreditTransactionRep.save(oCreditTransaction).subscribe();
-        return Mono.just(oCreditTransaction);
+    @GetMapping("/Credit/{idCredit}")
+    public Mono<ResponseHandler> FindbyCredit(@PathVariable("idCredit") String idCredit){
+        return creditTransactionService.findAllbyCredit(idCredit);
     }
 
     /**
      * Actualizar datos de cliente empresa
-     * @param oCreditTransaction
+     * @param id
      * @return
      */
-    @PutMapping()
-    public Mono<CreditTransaction> Update(@RequestBody CreditTransaction oCreditTransaction){
-        return oCreditTransactionRep.save(oCreditTransaction);
+    @PutMapping("/{id}")
+    public Mono<ResponseHandler> update(@PathVariable("id") String id, @RequestBody CreditTransaction creditTransaction) {
+        return creditTransactionService.update(id, creditTransaction);
     }
 
     /**
@@ -77,8 +71,8 @@ public class CreditTransactionController {
      * @return
      */
     @DeleteMapping("/{id}")
-    public void DeletebyId(@PathVariable("id") String id){
-        oCreditTransactionRep.deleteById(id);
+    public Mono<ResponseHandler>  DeletebyId(@PathVariable("id") String id){
+        return creditTransactionService.delete(id);
     }
 
     /**
@@ -86,9 +80,9 @@ public class CreditTransactionController {
      * @param oCreditTransaction
      * @return
      */
-    @PostMapping("RegisterCreditPay/")
-    public Mono<Result> RegisterCreditPay(@RequestBody CreditTransaction oCreditTransaction){
-        return oCreditTransactionSer.RegisterCreditPay(oCreditTransaction);
+    @PostMapping("Pay/")
+    public Mono<ResponseHandler> RegisterCreditPay(@RequestBody CreditTransaction oCreditTransaction){
+        return creditTransactionService.RegisterCreditPay(oCreditTransaction);
     }
 
     /**
@@ -96,9 +90,9 @@ public class CreditTransactionController {
      * @param oCreditTransaction
      * @return
      */
-    @PostMapping("RegisterCreditCharge/")
-    public Mono<Result> SaveCreditCardCharge(@RequestBody CreditTransaction oCreditTransaction){
-         return oCreditTransactionSer.RegisterCreditCharge(oCreditTransaction);
+    @PostMapping("Charge/")
+    public Mono<ResponseHandler> SaveCreditCardCharge(@RequestBody CreditTransaction oCreditTransaction){
+         return creditTransactionService.RegisterCreditCharge(oCreditTransaction);
     }
     
 }
