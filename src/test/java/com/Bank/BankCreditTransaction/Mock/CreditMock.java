@@ -4,8 +4,6 @@ import com.Bank.BankCreditTransaction.Models.Service.Credit;
 import com.Bank.BankCreditTransaction.Models.Service.Product;
 
 import java.math.BigDecimal;
-import java.util.Date;
-import java.util.UUID;
 
 public class CreditMock {
 
