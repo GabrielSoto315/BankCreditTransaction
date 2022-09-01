@@ -1,7 +1,6 @@
 package com.Bank.BankCreditTransaction.config;
 
-import com.Bank.BankCreditTransaction.Models.Entities.CreditMessage;
-import com.Bank.BankCreditTransaction.Models.Service.CreditResponse;
+import com.Bank.BankCreditTransaction.Models.Entities.EventMessage;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.springframework.context.annotation.Bean;
@@ -17,7 +16,7 @@ import java.util.Map;
 @Configuration
 public class KafkaCreditConfig {
 
-    public ProducerFactory<String, CreditMessage> producerFactory() {
+    public ProducerFactory<String, EventMessage> producerFactory() {
         Map<String, Object> config = new HashMap<>();
         config.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "127.0.0.1:9092");
         config.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
@@ -26,8 +25,8 @@ public class KafkaCreditConfig {
     }
 
     @Bean(name = "kafkaCreditTemplate")
-    public KafkaTemplate<String, CreditMessage> kafkaTemplate() {
-        return new KafkaTemplate<String, CreditMessage>(producerFactory());
+    public KafkaTemplate<String, EventMessage> kafkaTemplate() {
+        return new KafkaTemplate<String, EventMessage>(producerFactory());
     }
 
 }

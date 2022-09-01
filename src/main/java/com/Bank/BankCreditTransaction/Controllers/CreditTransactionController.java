@@ -2,11 +2,10 @@ package com.Bank.BankCreditTransaction.Controllers;
 
 import com.Bank.BankCreditTransaction.Models.Documents.CreditTransaction;
 import com.Bank.BankCreditTransaction.Models.Entities.CreditMessage;
+import com.Bank.BankCreditTransaction.Models.Entities.EventMessage;
 import com.Bank.BankCreditTransaction.Models.Entities.ResponseHandler;
-import com.Bank.BankCreditTransaction.Models.Service.CreditResponse;
 import com.Bank.BankCreditTransaction.Service.CreditTransactionService;
 import com.Bank.BankCreditTransaction.Service.producer.KafkaCreditProducer;
-import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,13 +20,6 @@ public class CreditTransactionController {
 
     @Autowired
     private CreditTransactionService creditTransactionService;
-
-    private final KafkaCreditProducer kafkaCreditProducer;
-
-    @Autowired
-    CreditTransactionController(KafkaCreditProducer kafkaStringProducer) {
-        this.kafkaCreditProducer = kafkaStringProducer;
-    }
 
     private static final Logger log = LoggerFactory.getLogger(CreditTransactionController.class);
 
@@ -99,14 +91,4 @@ public class CreditTransactionController {
     public Mono<ResponseHandler> SaveCreditCardCharge(@RequestBody CreditTransaction oCreditTransaction){
          return creditTransactionService.RegisterCreditCharge(oCreditTransaction);
     }
-
-
-    @PostMapping(value = "/publish")
-    public void sendMessageToKafkaTopic() {
-        CreditMessage creditResponse = new CreditMessage();
-        creditResponse.setIdCredit("Done");
-        creditResponse.setBalance(new BigDecimal(2400));
-        this.kafkaCreditProducer.sendMessage(creditResponse);
-    }
-    
 }

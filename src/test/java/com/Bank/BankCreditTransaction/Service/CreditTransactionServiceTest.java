@@ -1,6 +1,7 @@
 package com.Bank.BankCreditTransaction.Service;
 
 import com.Bank.BankCreditTransaction.Models.Documents.CreditTransaction;
+import com.Bank.BankCreditTransaction.Models.Entities.EventMessage;
 import com.Bank.BankCreditTransaction.Models.Service.CreditResponse;
 import com.Bank.BankCreditTransaction.Service.Implements.CreditServiceImp;
 import com.Bank.BankCreditTransaction.Service.Implements.CreditTransactionServiceImp;
@@ -8,6 +9,7 @@ import com.Bank.BankCreditTransaction.Mock.CreditMock;
 import com.Bank.BankCreditTransaction.Mock.CreditTransactionMock;
 import com.Bank.BankCreditTransaction.Models.Service.Credit;
 import com.Bank.BankCreditTransaction.Repository.ICreditTransactionRepository;
+import com.Bank.BankCreditTransaction.Service.producer.KafkaCreditProducer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -28,6 +30,8 @@ public class CreditTransactionServiceTest {
     private CreditServiceImp creditServiceImp;
     @InjectMocks
     private CreditTransactionServiceImp creditTransactionServiceImp;
+    @InjectMocks
+    private KafkaCreditProducer kafkaCreditProducer;
     @Mock
     private ICreditTransactionRepository creditTransactionRepository;
     @Mock
@@ -146,35 +150,6 @@ public class CreditTransactionServiceTest {
 
         StepVerifier.create(creditTransactionServiceImp.delete(creditTransaction.getIdTransaction()))
                 .expectNextMatches(x -> x.getMessage().equals("Not found"))
-                .expectComplete()
-                .verify();
-    }
-
-    @Test
-    void payTest() {
-        CreditTransaction creditTransaction = CreditTransactionMock.randomTransactionPay();
-        Credit credit = CreditMock.randomAccount();
-
-        CreditResponse creditResponseMono = new CreditResponse();
-        creditResponseMono.setMessage("Done");
-        creditResponseMono.setStatus("OK");
-        creditResponseMono.setData(credit);
-
-        Credit updateCredit = new Credit();
-        updateCredit.setIdCredit("25210000000004");
-        updateCredit.setBalance(credit.getBalance().add(creditTransaction.getAmount()));
-
-        Mockito.when(creditTransactionRepository.save(creditTransaction))
-                .thenReturn(Mono.just(creditTransaction));
-
-        Mockito.when(CreditService.FindCredit("25210000000004"))
-                .thenReturn(Mono.just(creditResponseMono));
-
-        Mockito.when(CreditService.UpdateCredit(updateCredit))
-                .thenReturn(Mono.just(creditResponseMono));
-
-        StepVerifier.create(creditTransactionServiceImp.RegisterCreditPay(creditTransaction))
-                .expectNextMatches(x -> x.getMessage().equals("Done"))
                 .expectComplete()
                 .verify();
     }

@@ -1,11 +1,15 @@
 package com.Bank.BankCreditTransaction.Service.Implements;
 
 import com.Bank.BankCreditTransaction.Models.Documents.CreditTransaction;
+import com.Bank.BankCreditTransaction.Models.Entities.CreditMessage;
+import com.Bank.BankCreditTransaction.Models.Entities.EventMessage;
 import com.Bank.BankCreditTransaction.Service.CreditService;
 import com.Bank.BankCreditTransaction.Service.CreditTransactionService;
 import com.Bank.BankCreditTransaction.Models.Entities.ResponseHandler;
 import com.Bank.BankCreditTransaction.Models.Service.Credit;
 import com.Bank.BankCreditTransaction.Repository.ICreditTransactionRepository;
+import com.Bank.BankCreditTransaction.Service.producer.KafkaCreditProducer;
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,12 +21,15 @@ import java.math.BigDecimal;
 import java.util.Date;
 
 @Service
+@RequiredArgsConstructor
 public class CreditTransactionServiceImp implements CreditTransactionService {
 
     @Autowired
-    private ICreditTransactionRepository creditTransactionRepository;
+    private final ICreditTransactionRepository creditTransactionRepository;
     @Autowired
-    private CreditService creditService;
+    private final CreditService creditService;
+    @Autowired
+    private KafkaCreditProducer kafkaCreditProducer;
 
     private static final Logger log = LoggerFactory.getLogger(CreditTransactionServiceImp.class);
 
@@ -107,9 +114,11 @@ public class CreditTransactionServiceImp implements CreditTransactionService {
                     updateCredit.setIdCredit(trans.getIdCredit());
                     updateCredit.setBalance(trans.getNewBalance());
                     log.info("Credit changes: " + updateCredit);
-                    return creditService.UpdateCredit(updateCredit).flatMap(up ->{
-                       return Mono.just(new ResponseHandler("Done", HttpStatus.OK, up));
-                    });
+                    EventMessage eventSend = new EventMessage();
+                    eventSend.setAction("UPDATE");
+                    eventSend.setData(updateCredit);
+                    this.kafkaCreditProducer.sendMessage(eventSend);
+                    return Mono.just(new ResponseHandler("Done", HttpStatus.OK, trans));
                 });
             });
     }
